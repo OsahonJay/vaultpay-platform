@@ -16,6 +16,21 @@ resource "aws_kms_key" "dynamodb" {
   deletion_window_in_days = 7
   enable_key_rotation     = true
 
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "EnableRootAccountAccess"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      }
+    ]
+  })
+
   tags = {
     Name        = "vaultpay-dynamodb-locks-key-${var.environment}"
     environment = var.environment
@@ -145,3 +160,5 @@ resource "aws_s3_bucket_notification" "terraform_state" {
 
   depends_on = [aws_sns_topic_policy.state_bucket_alerts]
 }
+
+data "aws_caller_identity" "current" {}
