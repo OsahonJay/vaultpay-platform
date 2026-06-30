@@ -83,3 +83,44 @@ resource "aws_s3_bucket_lifecycle_configuration" "terraform_state" {
     }
   }
 }
+
+resource "aws_sns_topic" "state_bucket_alerts" {
+  name = "vaultpay-state-bucket-alerts-${var.environment}"
+
+  tags = {
+    environment = var.environment
+    managed-by  = "terraform"
+  }
+}
+
+resource "aws_sns_topic_policy" "state_bucket_alerts" {
+  arn = aws_sns_topic.state_bucket_alerts.arn
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "s3.amazonaws.com"
+      }
+      Action   = "SNS:Publish"
+      Resource = aws_sns_topic.state_bucket_alerts.arn
+      Condition = {
+        ArnLike = {
+          "aws:SourceArn" = aws_s3_bucket.terraform_state.arn
+        }
+      }
+    }]
+  })
+}
+
+resource "aws_s3_bucket_notification" "terraform_state" {
+  bucket = aws_s3_bucket.terraform_state.id
+
+  topic {
+    topic_arn = aws_sns_topic.state_bucket_alerts.arn
+    events    = ["s3:ObjectRemoved:*"]
+  }
+
+  depends_on = [aws_sns_topic_policy.state_bucket_alerts]
+}
