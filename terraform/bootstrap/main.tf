@@ -90,6 +90,10 @@ server_side_encryption {
     kms_key_arn = aws_kms_key.dynamodb.arn
   }
 
+point_in_time_recovery {
+    enabled = true
+  }
+
   attribute {
     name = "LockID"
     type = "S"
