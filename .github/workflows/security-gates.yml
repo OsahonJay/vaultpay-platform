@@ -32,15 +32,9 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Run Semgrep
-        uses: semgrep/semgrep-action@v1
-        with:
-          config: >-
-            p/security-audit
-            p/secrets
-            p/terraform
-        env:
-          SEMGREP_RULES: p/security-audit
-          SEMGREP_EXCLUDE_RULES: terraform.lang.security.eks-public-endpoint-enabled.eks-public-endpoint-enabled
+        run: |
+          pip install semgrep
+          semgrep scan --config p/security-audit --config p/secrets --config p/terraform --exclude-rule terraform.lang.security.eks-public-endpoint-enabled.eks-public-endpoint-enabled --error
 
   iac-scan:
     name: IaC Scanning (Checkov)
