@@ -49,8 +49,12 @@ resource "aws_kms_key" "eks" {
     data-classification = "restricted"
   }
 }
-
+resource "aws_kms_alias" "eks" {
+  name          = "alias/${var.environment}-vaultpay-eks"
+  target_key_id = aws_kms_key.eks.key_id
+}
 data "aws_caller_identity" "current" {}
+
 
 # EKS Cluster IAM Role
 resource "aws_iam_role" "cluster" {
