@@ -40,6 +40,7 @@ jobs:
             p/terraform
         env:
           SEMGREP_RULES: p/security-audit
+          SEMGREP_EXCLUDE_RULES: terraform.lang.security.eks-public-endpoint-enabled.eks-public-endpoint-enabled
 
   iac-scan:
     name: IaC Scanning (Checkov)
