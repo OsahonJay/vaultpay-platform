@@ -7,11 +7,39 @@ terraform {
   }
 }
 
-# KMS key for EKS secrets encryption
 resource "aws_kms_key" "eks" {
   description             = "KMS key for EKS secrets encryption - ${var.environment}"
   deletion_window_in_days = 7
   enable_key_rotation     = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "EnableRootAccountAccess"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowEKSClusterRole"
+        Effect = "Allow"
+        Principal = {
+          AWS = aws_iam_role.cluster.arn
+        }
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:GenerateDataKey",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
 
   tags = {
     Name            = "${var.environment}-vaultpay-eks-key"
@@ -22,6 +50,7 @@ resource "aws_kms_key" "eks" {
   }
 }
 
+data "aws_caller_identity" "current" {}
 resource "aws_kms_alias" "eks" {
   name          = "alias/${var.environment}-vaultpay-eks"
   target_key_id = aws_kms_key.eks.key_id
