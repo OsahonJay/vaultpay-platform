@@ -12,10 +12,6 @@ provider "aws" {
 }
 
 # checkov:skip=CKV_AWS_144: Cross-region replication deferred for dev - accepted risk, see ADR-002
-# Single-region state acceptable at this stage given low blast radius and active
-# development velocity. Required before production go-live per DR requirements
-# (RTO/RPO documented in docs/adr/002-disaster-recovery.md). Risk accepted by:
-# Osahon Seth I, 2026-06-30. Revisit date: before production environment provisioning.
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "vaultpay-terraform-state-${var.environment}"
 
