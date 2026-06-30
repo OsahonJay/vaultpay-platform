@@ -11,7 +11,7 @@ provider "aws" {
   region = var.region
 }
 
-# checkov:skip=CKV_AWS_144: Cross-region replication deferred for dev environment.
+# checkov:skip=CKV_AWS_144: Cross-region replication deferred for dev - accepted risk, see ADR-002
 # Single-region state acceptable at this stage given low blast radius and active
 # development velocity. Required before production go-live per DR requirements
 # (RTO/RPO documented in docs/adr/002-disaster-recovery.md). Risk accepted by:
