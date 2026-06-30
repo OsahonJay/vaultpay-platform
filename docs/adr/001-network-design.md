@@ -51,3 +51,4 @@ VPC Flow Logs capture network traffic metadata — which in a fintech environmen
 Network segmentation with private subnets directly satisfies PCI-DSS 
 Requirement 1.3, which mandates restricting inbound and outbound traffic 
 to only that which is necessary for the cardholder data environment.
+# test trigger
