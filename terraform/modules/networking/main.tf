@@ -210,3 +210,13 @@ resource "aws_iam_role_policy" "flow_logs" {
     }]
   })
 }
+resource "aws_default_security_group" "default" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name        = "${var.environment}-vaultpay-default-sg-locked"
+    environment = var.environment
+    managed-by  = "terraform"
+  }
+}
+
