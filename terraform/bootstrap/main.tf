@@ -11,7 +11,6 @@ provider "aws" {
   region = var.region
 }
 
-# checkov:skip=CKV_AWS_144: Cross-region replication deferred for dev - accepted risk, see ADR-002
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "vaultpay-terraform-state-${var.environment}"
 
