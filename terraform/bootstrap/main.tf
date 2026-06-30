@@ -85,7 +85,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "terraform_state" {
 }
 
 resource "aws_sns_topic" "state_bucket_alerts" {
-  name = "vaultpay-state-bucket-alerts-${var.environment}"
+  name              = "vaultpay-state-bucket-alerts-${var.environment}"
+  kms_master_key_id = "alias/aws/sns"
 
   tags = {
     environment = var.environment
