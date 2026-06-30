@@ -16,7 +16,6 @@ provider "aws" {
 # development velocity. Required before production go-live per DR requirements
 # (RTO/RPO documented in docs/adr/002-disaster-recovery.md). Risk accepted by:
 # Osahon Seth I, 2026-06-30. Revisit date: before production environment provisioning.
-
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "vaultpay-terraform-state-${var.environment}"
 
