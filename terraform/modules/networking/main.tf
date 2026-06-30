@@ -163,7 +163,7 @@ resource "aws_flow_log" "main" {
 
 resource "aws_cloudwatch_log_group" "flow_logs" {
   name              = "/vaultpay/${var.environment}/vpc-flow-logs"
-  retention_in_days = 90
+  retention_in_days = 365
 
   tags = {
     environment = var.environment
