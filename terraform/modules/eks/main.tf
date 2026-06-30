@@ -42,19 +42,19 @@ resource "aws_kms_key" "eks" {
   })
 
   tags = {
-    Name            = "${var.environment}-vaultpay-eks-key"
-    environment     = var.environment
-    managed-by      = "terraform"
-    cost-centre     = "platform"
+    Name                = "${var.environment}-vaultpay-eks-key"
+    environment         = var.environment
+    managed-by          = "terraform"
+    cost-centre         = "platform"
     data-classification = "restricted"
   }
 }
-
-data "aws_caller_identity" "current" {}
 resource "aws_kms_alias" "eks" {
   name          = "alias/${var.environment}-vaultpay-eks"
   target_key_id = aws_kms_key.eks.key_id
 }
+data "aws_caller_identity" "current" {}
+
 
 # EKS Cluster IAM Role
 resource "aws_iam_role" "cluster" {
@@ -111,10 +111,10 @@ resource "aws_eks_cluster" "main" {
   ]
 
   tags = {
-    Name            = "${var.environment}-vaultpay-eks"
-    environment     = var.environment
-    managed-by      = "terraform"
-    cost-centre     = "platform"
+    Name                = "${var.environment}-vaultpay-eks"
+    environment         = var.environment
+    managed-by          = "terraform"
+    cost-centre         = "platform"
     data-classification = "confidential"
   }
 

@@ -163,7 +163,8 @@ resource "aws_flow_log" "main" {
 
 resource "aws_cloudwatch_log_group" "flow_logs" {
   name              = "/vaultpay/${var.environment}/vpc-flow-logs"
-  retention_in_days = 90
+  retention_in_days = 365
+  kms_key_id        = aws_kms_key.flow_logs.arn
 
   tags = {
     environment = var.environment
@@ -206,7 +207,60 @@ resource "aws_iam_role_policy" "flow_logs" {
         "logs:DescribeLogGroups",
         "logs:DescribeLogStreams"
       ]
-      Resource = "*"
+      Resource = "${aws_cloudwatch_log_group.flow_logs.arn}:*"
     }]
   })
 }
+resource "aws_default_security_group" "default" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name        = "${var.environment}-vaultpay-default-sg-locked"
+    environment = var.environment
+    managed-by  = "terraform"
+  }
+}
+resource "aws_kms_key" "flow_logs" {
+  description             = "KMS key for VPC Flow Logs encryption - ${var.environment}"
+  deletion_window_in_days = 7
+  enable_key_rotation     = true
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "EnableRootAccountAccess"
+        Effect = "Allow"
+        Principal = {
+          AWS = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"
+        }
+        Action   = "kms:*"
+        Resource = "*"
+      },
+      {
+        Sid    = "AllowCloudWatchLogs"
+        Effect = "Allow"
+        Principal = {
+          Service = "logs.eu-west-2.amazonaws.com"
+        }
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:GenerateDataKey",
+          "kms:DescribeKey"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+
+  tags = {
+    Name        = "${var.environment}-vaultpay-flow-logs-key"
+    environment = var.environment
+    managed-by  = "terraform"
+  }
+}
+
+data "aws_caller_identity" "current" {}
+
+
