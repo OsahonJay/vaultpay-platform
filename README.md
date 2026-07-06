@@ -75,7 +75,8 @@ Our default security assumption is that the environment is already breached and 
 
 ## Platform Capabilities
 
-**Isolated network foundation** — [your week 1 sentence about VPC/subnets/NAT/flow logs]
+**Isolated network foundation** — Isolated network foundation — VPC across 3 Availability Zones with private 
+worker nodes, NAT Gateway per AZ, and VPC Flow Logs capturing all traffic metadata for forensic investigation.
 
 **EKS cluster** — Orchestrates containerised workloads on private worker nodes with 
 KMS-encrypted Kubernetes secrets, full control plane audit logging, and pod-level 
