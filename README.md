@@ -19,7 +19,7 @@ a foothold elsewhere in the environment, they cannot directly reach EKS worker
 nodes handling cardholder data. All inbound traffic passes through the load 
 balancer — a single controlled entry point.
 
-\```mermaid
+```mermaid
 graph TB
     subgraph Internet
         User[Developer / CI Pipeline]
@@ -67,7 +67,7 @@ graph TB
     EKS --> KMS
     NODE1 & NODE2 & NODE3 --> SM
     EKS --> CW
-\```
+```
 
 ## Security Posture
 VaultPay Platform is built to meet PCI-DSS compliance requirements. 
