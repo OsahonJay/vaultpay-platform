@@ -74,7 +74,20 @@ VaultPay Platform is built to meet PCI-DSS compliance requirements.
 Our default security assumption is that the environment is already breached and every control is designed around that posture.
 
 ## Platform Capabilities
-*Updated per build phase.*
+
+**Isolated network foundation** — [your week 1 sentence about VPC/subnets/NAT/flow logs]
+
+**EKS cluster** — Orchestrates containerised workloads on private worker nodes with 
+KMS-encrypted Kubernetes secrets, full control plane audit logging, and pod-level 
+AWS authentication via IRSA.
+
+**Automated security gates** — Four-gate pipeline (Gitleaks, Semgrep, Trivy, Checkov) 
+enforcing zero-tolerance secret scanning, tiered CVE blocking (critical/high blocks merge, 
+medium warns, low logs), and IaC misconfiguration detection before anything reaches the cluster.
+
+**State management** — Terraform state stored in KMS-encrypted S3 with versioning, 
+DynamoDB distributed locking, SNS alerts on state deletion, and 90-day version retention 
+for audit and recovery.
 
 ## Getting Started
 *Prerequisites and setup instructions added once foundation is complete.*
