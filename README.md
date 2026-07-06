@@ -91,4 +91,29 @@ DynamoDB distributed locking, SNS alerts on state deletion, and 90-day version r
 for audit and recovery.
 
 ## Getting Started
-*Prerequisites and setup instructions added once foundation is complete.*
+
+### Prerequisites
+- Terraform v1.15.7+
+- AWS CLI v2.35+
+- kubectl v1.36+
+- AWS account with permissions for: EKS, EC2, S3, DynamoDB, KMS, IAM, CloudWatch, SNS
+
+### 1. Clone the repository
+git clone https://github.com/OsahonJay/vaultpay-platform.git
+cd vaultpay-platform
+
+### 2. Provision the state backend
+cd terraform/bootstrap
+terraform init
+terraform apply -var="environment=dev"
+
+### 3. Provision the platform
+cd ../environments/dev
+terraform init
+terraform apply
+
+### 4. Connect to the cluster
+aws eks update-kubeconfig --region eu-west-2 --name dev-vaultpay
+
+### 5. Verify worker nodes
+kubectl get nodes
