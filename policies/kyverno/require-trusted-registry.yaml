@@ -1,0 +1,29 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-trusted-registry
+  annotations:
+    policies.kyverno.io/title: Require Trusted Container Registry
+    policies.kyverno.io/description: >-
+      All container images must originate from VaultPay's approved
+      ECR registry. Public registries including Docker Hub are not
+      permitted. This prevents supply chain attacks via unvetted
+      third-party images reaching the payment platform.
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+  - name: check-registry
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+          namespaces:
+          - default
+    validate:
+      message: "Container images must come from VaultPay's approved ECR registry: 875522883478.dkr.ecr.eu-west-2.amazonaws.com/vaultpay/. Public registry images are not permitted."
+      pattern:
+        spec:
+          containers:
+          - image: "875522883478.dkr.ecr.eu-west-2.amazonaws.com/vaultpay/*"
