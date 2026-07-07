@@ -27,3 +27,5 @@ spec:
         spec:
           containers:
           - image: "875522883478.dkr.ecr.eu-west-2.amazonaws.com/vaultpay/*"
+          =(initContainers):
+          - image: "875522883478.dkr.ecr.eu-west-2.amazonaws.com/vaultpay/*"
