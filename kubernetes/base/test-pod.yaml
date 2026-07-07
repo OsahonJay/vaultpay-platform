@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: vaultpay-irsa-test
+  namespace: default
+spec:
+  serviceAccountName: vaultpay-app-sa
+  containers:
+  - name: aws-cli
+    image: amazon/aws-cli:latest
+    command:
+    - /bin/bash
+    - -c
+    - |
+      echo "=== Checkpoint A: IRSA environment variables ==="
+      echo "AWS_ROLE_ARN: $AWS_ROLE_ARN"
+      echo "AWS_WEB_IDENTITY_TOKEN_FILE: $AWS_WEB_IDENTITY_TOKEN_FILE"
+      echo ""
+      echo "=== Checkpoint B: Who am I? ==="
+      aws sts get-caller-identity
+      echo ""
+      echo "=== Checkpoint C: Read the secret ==="
+      aws secretsmanager get-secret-value \
+        --secret-id vaultpay/dev/app-secret \
+        --region eu-west-2 \
+        --query SecretString \
+        --output text
+      echo ""
+      echo "=== Checkpoint D: Verify ListSecrets is blocked ==="
+      aws secretsmanager list-secrets --region eu-west-2 && echo "FAIL: ListSecrets succeeded" || echo "PASS: ListSecrets correctly denied"
+  restartPolicy: Never

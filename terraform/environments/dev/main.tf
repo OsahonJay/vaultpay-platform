@@ -23,3 +23,12 @@ module "eks" {
   environment        = "dev"
   private_subnet_ids = module.networking.private_subnet_ids
 }
+module "irsa" {
+  source = "../../modules/irsa"
+
+  environment          = "dev"
+  oidc_provider_arn    = module.eks.oidc_provider_arn
+  oidc_provider_url    = replace(module.eks.cluster_oidc_issuer_url, "https://", "")
+  namespace            = "default"
+  service_account_name = "vaultpay-app-sa"
+}
