@@ -168,3 +168,4 @@ resource "aws_s3_bucket_notification" "terraform_state" {
 }
 
 data "aws_caller_identity" "current" {}
+
