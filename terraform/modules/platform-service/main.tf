@@ -131,7 +131,7 @@ resource "kubernetes_deployment" "service" {
             run_as_non_root            = true
             read_only_root_filesystem  = true
             capabilities {
-              drop = ["NET_RAW"]
+              drop = ["ALL"]
             }
 
           }
