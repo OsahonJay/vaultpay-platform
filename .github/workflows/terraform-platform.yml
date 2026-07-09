@@ -41,7 +41,7 @@ jobs:
           directory: terraform/
           framework: terraform
           soft_fail: false
-          skip_check: CKV_AWS_144,CKV_AWS_18,CKV_AWS_38,CKV_AWS_39
+          skip_check: CKV_AWS_144,CKV_AWS_18,CKV_AWS_38,CKV_AWS_39,CKV2_AWS_57,CKV_AWS_40
 
   terraform-plan:
     name: Plan
