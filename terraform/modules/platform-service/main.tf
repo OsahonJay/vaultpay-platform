@@ -162,7 +162,7 @@ resource "kubernetes_network_policy" "service" {
       from {
         namespace_selector {
           match_labels = {
-           "kubernetes.io/metadata.name" = var.namespace
+            "kubernetes.io/metadata.name" = var.namespace
           }
         }
       }

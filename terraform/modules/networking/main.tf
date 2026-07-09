@@ -22,28 +22,28 @@ resource "aws_vpc" "main" {
   enable_dns_support   = true
 
   tags = {
-    Name            = "${var.environment}-vaultpay-vpc"
-    environment     = var.environment
-    managed-by      = "terraform"
-    cost-centre     = "platform"
+    Name                = "${var.environment}-vaultpay-vpc"
+    environment         = var.environment
+    managed-by          = "terraform"
+    cost-centre         = "platform"
     data-classification = "confidential"
   }
 }
 
 # Public Subnets
 resource "aws_subnet" "public" {
-  count             = 3
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = cidrsubnet(var.vpc_cidr, 4, count.index)
-  availability_zone = local.azs[count.index]
+  count                   = 3
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = cidrsubnet(var.vpc_cidr, 4, count.index)
+  availability_zone       = local.azs[count.index]
   map_public_ip_on_launch = false
 
   tags = {
-    Name            = "${var.environment}-public-${local.azs[count.index]}"
-    environment     = var.environment
-    managed-by      = "terraform"
-    cost-centre     = "platform"
-    data-classification = "public"
+    Name                     = "${var.environment}-public-${local.azs[count.index]}"
+    environment              = var.environment
+    managed-by               = "terraform"
+    cost-centre              = "platform"
+    data-classification      = "public"
     "kubernetes.io/role/elb" = "1"
   }
 }
@@ -56,11 +56,11 @@ resource "aws_subnet" "private" {
   availability_zone = local.azs[count.index]
 
   tags = {
-    Name            = "${var.environment}-private-${local.azs[count.index]}"
-    environment     = var.environment
-    managed-by      = "terraform"
-    cost-centre     = "platform"
-    data-classification = "confidential"
+    Name                              = "${var.environment}-private-${local.azs[count.index]}"
+    environment                       = var.environment
+    managed-by                        = "terraform"
+    cost-centre                       = "platform"
+    data-classification               = "confidential"
     "kubernetes.io/role/internal-elb" = "1"
   }
 }
