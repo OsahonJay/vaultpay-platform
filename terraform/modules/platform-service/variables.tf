@@ -45,7 +45,7 @@ variable "oidc_provider_url" {
 variable "namespace" {
   description = "Kubernetes namespace to deploy into"
   type        = string
-  default     = "default"
+  default     = "vaultpay"
 }
 
 variable "replicas" {

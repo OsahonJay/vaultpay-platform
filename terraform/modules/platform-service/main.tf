@@ -27,6 +27,17 @@ resource "aws_iam_role" "service" {
   }
 }
 
+resource "kubernetes_namespace" "service" {
+  metadata {
+    name = var.namespace
+    labels = {
+      environment = var.environment
+      managed-by  = "terraform"
+    }
+  }
+}
+
+
 resource "aws_iam_role_policy" "service_secrets" {
   name = "${var.environment}-${var.service_name}-secrets-policy"
   role = aws_iam_role.service.id
@@ -47,7 +58,7 @@ resource "aws_iam_role_policy" "service_secrets" {
 resource "kubernetes_service_account" "service" {
   metadata {
     name      = "${var.service_name}-sa"
-    namespace = var.namespace
+    namespace = kubernetes_namespace.service.metadata[0].name
     annotations = {
       "eks.amazonaws.com/role-arn" = aws_iam_role.service.arn
     }
@@ -57,7 +68,7 @@ resource "kubernetes_service_account" "service" {
 resource "kubernetes_deployment" "service" {
   metadata {
     name      = var.service_name
-    namespace = var.namespace
+    namespace = kubernetes_namespace.service.metadata[0].name
     labels = {
       app         = var.service_name
       environment = var.environment
@@ -119,6 +130,14 @@ resource "kubernetes_deployment" "service" {
             run_as_non_root            = true
             read_only_root_filesystem  = true
           }
+          readiness_probe {
+            http_get {
+              path = "/health"
+              port = var.container_port
+            }
+            initial_delay_seconds = 5
+            period_seconds        = 10
+          }
         }
       }
     }
@@ -128,7 +147,7 @@ resource "kubernetes_deployment" "service" {
 resource "kubernetes_service" "service" {
   metadata {
     name      = var.service_name
-    namespace = var.namespace
+    namespace = kubernetes_namespace.service.metadata[0].name
   }
 
   spec {
@@ -148,7 +167,7 @@ resource "kubernetes_service" "service" {
 resource "kubernetes_network_policy" "service" {
   metadata {
     name      = "${var.service_name}-netpol"
-    namespace = var.namespace
+    namespace = kubernetes_namespace.service.metadata[0].name
   }
 
   spec {
