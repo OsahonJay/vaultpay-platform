@@ -117,3 +117,11 @@ aws eks update-kubeconfig --region eu-west-2 --name dev-vaultpay
 
 ### 5. Verify worker nodes
 kubectl get nodes
+
+## Known Limitations
+
+**Terraform CI/CD Apply on fresh environment:** The `terraform-apply` job in the 
+Terraform Platform pipeline fails when the dev environment has been destroyed. 
+The Kubernetes provider requires a running EKS cluster to generate a plan, creating 
+a chicken-and-egg dependency. Resolution is to split the pipeline into two stages: 
+AWS infrastructure first, Kubernetes resources second. Tracked as a future improvement.
