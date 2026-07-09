@@ -97,8 +97,9 @@ resource "kubernetes_deployment" "service" {
         service_account_name = kubernetes_service_account.service.metadata[0].name
 
         container {
-          name  = var.service_name
-          image = var.container_image
+          name              = var.service_name
+          image             = var.container_image
+          image_pull_policy = "Always"
 
           port {
             container_port = var.container_port
@@ -129,6 +130,10 @@ resource "kubernetes_deployment" "service" {
             allow_privilege_escalation = false
             run_as_non_root            = true
             read_only_root_filesystem  = true
+            capabilities {
+              drop = ["NET_RAW"]
+            }
+
           }
           readiness_probe {
             http_get {
@@ -137,6 +142,14 @@ resource "kubernetes_deployment" "service" {
             }
             initial_delay_seconds = 5
             period_seconds        = 10
+          }
+          liveness_probe {
+            http_get {
+              path = "/health"
+              port = var.container_port
+            }
+            initial_delay_seconds = 15
+            period_seconds        = 20
           }
         }
       }
