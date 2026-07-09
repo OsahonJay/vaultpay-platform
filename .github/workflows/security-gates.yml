@@ -3,8 +3,21 @@ name: Security Gates
 on:
   pull_request:
     branches: [main]
+    paths:
+      - '**.tf'
+      - '**.py'
+      - '**.js'
+      - 'Dockerfile'
+      - '.github/workflows/**'
   push:
     branches: [main]
+    paths:
+      - '**.tf'
+      - '**.py'
+      - '**.js'
+      - 'Dockerfile'
+      - '.github/workflows/**'
+
 
 permissions:
   contents: read
