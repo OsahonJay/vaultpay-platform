@@ -114,6 +114,17 @@ jobs:
           cd terraform/environments/dev-aws
           terraform init
 
+      - name: Pre-apply cleanup (dev only - not for production)
+        run: |
+          aws secretsmanager delete-secret \
+            --secret-id vaultpay/dev/app-secret \
+            --force-delete-without-recovery \
+            --region eu-west-2 2>/dev/null || true
+          
+          aws logs create-log-group \
+            --log-group-name /vaultpay/dev/vpc-flow-logs \
+            --region eu-west-2 2>/dev/null || true
+
       - name: Terraform Plan
         run: |
           cd terraform/environments/dev-aws
