@@ -264,3 +264,16 @@ resource "aws_kms_key" "flow_logs" {
 data "aws_caller_identity" "current" {}
 
 
+resource "aws_vpc_endpoint" "secretsmanager" {
+  vpc_id              = aws_vpc.main.id
+  service_name        = "com.amazonaws.eu-west-2.secretsmanager"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = aws_subnet.private[*].id
+  private_dns_enabled = true
+
+  tags = {
+    Name        = "${var.environment}-vaultpay-secretsmanager-endpoint"
+    environment = var.environment
+    managed-by  = "terraform"
+  }
+}

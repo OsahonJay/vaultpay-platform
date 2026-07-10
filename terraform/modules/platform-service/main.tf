@@ -189,6 +189,17 @@ resource "kubernetes_network_policy" "service" {
         app = var.service_name
       }
     }
+    egress {
+      ports {
+        port     = "443"
+        protocol = "TCP"
+      }
+      to {
+        ip_block {
+          cidr = "10.0.0.0/16"
+        }
+      }
+    }
 
     ingress {
       from {
