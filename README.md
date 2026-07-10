@@ -118,10 +118,14 @@ aws eks update-kubeconfig --region eu-west-2 --name dev-vaultpay
 ### 5. Verify worker nodes
 kubectl get nodes
 
-## Known Limitations
+## CI/CD Pipeline
 
-**Terraform CI/CD Apply on fresh environment:** The `terraform-apply` job in the 
-Terraform Platform pipeline fails when the dev environment has been destroyed. 
-The Kubernetes provider requires a running EKS cluster to generate a plan, creating 
-a chicken-and-egg dependency. Resolution is to split the pipeline into two stages: 
-AWS infrastructure first, Kubernetes resources second. Tracked as a future improvement.
+Two automated pipelines run on every change to `terraform/**`:
+
+**Security Gates** — runs on every PR and push. Four gates: Gitleaks (secret scanning), 
+Semgrep (SAST), Trivy (dependency scanning), Checkov (IaC scanning). All gates must 
+pass before merge.
+
+**Terraform Platform** — runs validate on every PR, apply on merge to main. Split into 
+two sequential stages: AWS infrastructure first, Kubernetes resources second. 
+Authentication uses GitHub Actions OIDC — no long-lived credentials stored in GitHub.
