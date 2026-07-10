@@ -29,9 +29,15 @@ jobs:
       - name: Terraform Format Check
         run: terraform fmt -check -recursive terraform/
 
-      - name: Terraform Validate
+      - name: Validate AWS Layer
         run: |
-          cd terraform/environments/dev
+          cd terraform/environments/dev-aws
+          terraform init -backend=false
+          terraform validate
+
+      - name: Validate Kubernetes Layer
+        run: |
+          cd terraform/environments/dev-kubernetes
           terraform init -backend=false
           terraform validate
 
@@ -43,8 +49,8 @@ jobs:
           soft_fail: false
           skip_check: CKV_AWS_144,CKV_AWS_18,CKV_AWS_38,CKV_AWS_39,CKV2_AWS_57,CKV2_AWS_40,CKV_K8S_43,CKV_AWS_290,CKV_AWS_355,CKV_AWS_286,CKV_AWS_288,CKV_AWS_289,CKV_AWS_287,CKV_AWS_149,CKV_AWS_287,CKV_AWS_149
 
-  terraform-plan:
-    name: Plan
+  terraform-plan-aws:
+    name: Plan AWS
     runs-on: ubuntu-latest
     needs: terraform-validate
     if: github.event_name == 'pull_request'
@@ -63,12 +69,12 @@ jobs:
 
       - name: Terraform Init
         run: |
-          cd terraform/environments/dev
+          cd terraform/environments/dev-aws
           terraform init
 
       - name: Terraform Plan
         run: |
-          cd terraform/environments/dev
+          cd terraform/environments/dev-aws
           terraform plan -no-color 2>&1 | tee plan-output.txt
 
       - name: Post Plan to PR
@@ -76,17 +82,17 @@ jobs:
         with:
           script: |
             const fs = require('fs');
-            const plan = fs.readFileSync('terraform/environments/dev/plan-output.txt', 'utf8');
+            const plan = fs.readFileSync('terraform/environments/dev-aws/plan-output.txt', 'utf8');
             const truncated = plan.length > 65000 ? plan.substring(0, 65000) + '\n... truncated' : plan;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '## Terraform Plan\n```\n' + truncated + '\n```'
+              body: '## Terraform Plan (AWS Layer)\n```\n' + truncated + '\n```'
             });
 
-  terraform-apply:
-    name: Apply
+  terraform-apply-aws:
+    name: Apply AWS
     runs-on: ubuntu-latest
     needs: terraform-validate
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -105,15 +111,48 @@ jobs:
 
       - name: Terraform Init
         run: |
-          cd terraform/environments/dev
+          cd terraform/environments/dev-aws
           terraform init
 
       - name: Terraform Plan
         run: |
-          cd terraform/environments/dev
+          cd terraform/environments/dev-aws
           terraform plan -out=tfplan
 
       - name: Terraform Apply
         run: |
-          cd terraform/environments/dev
+          cd terraform/environments/dev-aws
+          terraform apply tfplan
+
+  terraform-apply-kubernetes:
+    name: Apply Kubernetes
+    runs-on: ubuntu-latest
+    needs: terraform-apply-aws
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.15.7"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::875522883478:role/github-actions-terraform-role
+          aws-region: eu-west-2
+
+      - name: Terraform Init
+        run: |
+          cd terraform/environments/dev-kubernetes
+          terraform init
+
+      - name: Terraform Plan
+        run: |
+          cd terraform/environments/dev-kubernetes
+          terraform plan -out=tfplan
+
+      - name: Terraform Apply
+        run: |
+          cd terraform/environments/dev-kubernetes
           terraform apply tfplan
