@@ -121,6 +121,11 @@ jobs:
             --force-delete-without-recovery \
             --region eu-west-2 2>/dev/null || true
           
+          cd terraform/environments/dev-aws
+          terraform import \
+            module.networking.aws_cloudwatch_log_group.flow_logs \
+            /vaultpay/dev/vpc-flow-logs 2>/dev/null || true
+          
           aws logs create-log-group \
             --log-group-name /vaultpay/dev/vpc-flow-logs \
             --region eu-west-2 2>/dev/null || true
