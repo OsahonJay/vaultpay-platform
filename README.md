@@ -12,62 +12,14 @@ is automated, and a compliance team that can trace every PCI-DSS control to evid
 VaultPay Platform is the infrastructure and delivery platform. It is not a payment application and contains no payment processing logic.
 
 ## Architecture Overview
-## Architecture Overview
 
 Payment services run in private subnets so that even if an attacker gains 
 a foothold elsewhere in the environment, they cannot directly reach EKS worker 
 nodes handling cardholder data. All inbound traffic passes through the load 
 balancer — a single controlled entry point.
 
-```mermaid
-graph TB
-    subgraph Internet
-        User[Developer / CI Pipeline]
-    end
 
-    subgraph AWS eu-west-2
-        subgraph VPC 10.0.0.0/16
-            subgraph Public Subnets
-                IGW[Internet Gateway]
-                NAT1[NAT GW AZ-a]
-                NAT2[NAT GW AZ-b]
-                NAT3[NAT GW AZ-c]
-                ALB[Load Balancer]
-            end
-
-            subgraph Private Subnets
-                EKS[EKS Control Plane]
-                NODE1[Worker Node AZ-a]
-                NODE2[Worker Node AZ-b]
-                NODE3[Worker Node AZ-c]
-            end
-        end
-
-        subgraph Security and Secrets
-            KMS[KMS Keys]
-            SM[Secrets Manager]
-            CW[CloudWatch Logs]
-        end
-
-        subgraph State Management
-            S3[Terraform State S3]
-            DDB[DynamoDB Lock Table]
-        end
-    end
-
-    User -->|HTTPS| ALB
-    ALB --> NODE1
-    ALB --> NODE2
-    ALB --> NODE3
-    NODE1 & NODE2 & NODE3 --> EKS
-    NODE1 -->|NAT| NAT1
-    NODE2 -->|NAT| NAT2
-    NODE3 -->|NAT| NAT3
-    NAT1 & NAT2 & NAT3 --> IGW
-    EKS --> KMS
-    NODE1 & NODE2 & NODE3 --> SM
-    EKS --> CW
-```
+![VaultPay Platform Architecture](docs/architecture.png)
 
 ## Security Posture
 VaultPay Platform is built to meet PCI-DSS compliance requirements. 
