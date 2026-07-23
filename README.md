@@ -16,7 +16,7 @@ VaultPay Platform is the infrastructure and delivery platform. It is not a payme
 Payment services run in private subnets so that even if an attacker gains 
 a foothold elsewhere in the environment, they cannot directly reach EKS worker 
 nodes handling cardholder data. All inbound traffic passes through the load 
-balancer — a single controlled entry point.
+balancer which is a single controlled entry point.
 
 
 ![VaultPay Platform Architecture](docs/architecture.png)
@@ -27,7 +27,7 @@ Our default security assumption is that the environment is already breached and 
 
 ## Platform Capabilities
 
-**Isolated network foundation** — Isolated network foundation — VPC across 3 Availability Zones with private 
+**Isolated network foundation** - Isolated network foundation — VPC across 3 Availability Zones with private 
 worker nodes, NAT Gateway per AZ, and VPC Flow Logs capturing all traffic metadata for forensic investigation.
 
 **EKS cluster** — Orchestrates containerised workloads on private worker nodes with 
@@ -80,4 +80,4 @@ pass before merge.
 
 **Terraform Platform** — runs validate on every PR, apply on merge to main. Split into 
 two sequential stages: AWS infrastructure first, Kubernetes resources second. 
-Authentication uses GitHub Actions OIDC — no long-lived credentials stored in GitHub.
+Authentication uses GitHub Actions OIDC which ensures no long-lived credentials stored in GitHub.
